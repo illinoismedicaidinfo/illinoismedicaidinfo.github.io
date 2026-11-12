@@ -20,10 +20,10 @@
      .jump-nav         "On this page" pill links to section ids
    Components
      .hero             home page title band;  .hero-sub  one-line subtitle
-     .topic-grid       the big topic buttons;  .topic-btn  one button
+     .topic-grid       the big topic buttons;  .topic-btn  one button (same link-card look as .card-link)
                        .topic-icon / .topic-label / .topic-hint  its parts
      .card-grid        responsive grid of cards
-     .card             rounded panel;  .card-link  whole card is a link
+     .card             rounded panel;  .card-link  whole card is a link: green circle icon, title, CSS arrow
                        .card-title / .card-text  its parts;  .card-plain  no shadow
      .choice-grid      "do ONE of these" parallel cards;  .choice  one card
                        .choice-or  the "or" divider between choices
@@ -36,7 +36,7 @@
      .phone-strip      full-width band with the main phone number
      .phone-list       who-to-call list;  .phone-item  one entry
                        .phone-name / .phone-for / .phone-meta / .phone-num
-     .tel              a tel: link: inline in sentences, a call button when standalone
+     .tel              a tel: link: always a green pill call button (small inline, medium in rows, big in .tel-big)
      .clinic-list      list of clinic cards;  .clinic  one card
                        .clinic-name / .clinic-addr / .clinic-actions
      .btn              button-like link;  .btn-primary  filled;  .btn-ghost  outline
@@ -168,19 +168,12 @@ a:hover { text-decoration-thickness: 3px; }
 .hero-sub { font-size: var(--text-lg, 1.25rem); max-width: 34ch; margin-bottom: 0.75rem; }
 .hero-note { color: var(--color-text-muted); max-width: 46ch; }
 .topic-grid { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 0.875rem; }
-.topic-btn {
-  display: flex; align-items: center; gap: 1rem; min-height: 4.5rem;
-  padding: 1rem 1.125rem; border-radius: var(--radius-md);
-  color: var(--color-text); text-decoration: none;
-  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
-}
-.topic-btn:hover { box-shadow: var(--shadow-card-hover, var(--shadow-card)); transform: translateY(-1px); }
-.topic-icon { display: inline-grid; place-items: center; width: 3rem; height: 3rem; flex: none; }
-.topic-icon .icon { width: 1.5rem; height: 1.5rem; }
+/* Surface, icon, title, arrow and hover are shared with .card-link (see Cards) */
+.topic-btn { min-height: 4.5rem; padding: 1rem 1.125rem; }
 .topic-text { display: flex; flex-direction: column; flex: 1; }
-.topic-label { font-family: var(--font-display); font-weight: 700; font-size: 1.3125rem; line-height: 1.25; color: var(--color-primary); }
+.topic-label { font-size: 1.3125rem; line-height: 1.25; }
 .topic-hint { font-size: var(--text-sm, 1.0625rem); color: var(--color-text-muted); line-height: 1.4; margin-top: 0.15rem; }
-.topic-btn > .icon { color: var(--color-primary); width: 1.5rem; height: 1.5rem; }
+.topic-btn > .icon { display: none; } /* the inline arrow; the shared ::after arrow replaces it */
 
 /* ---------- Inner page head ---------- */
 .page-head { padding: 1.75rem 0 2rem; }
@@ -231,16 +224,35 @@ a:hover { text-decoration-thickness: 3px; }
 .card-plain { box-shadow: none; }
 .card-title { font-size: var(--text-h3, 1.25rem); margin: 0 0 0.375rem; }
 .card-text { color: var(--color-text-muted); margin: 0; }
-.card-link {
-  display: flex; gap: 1rem; align-items: flex-start; height: 100%; min-height: 44px;
-  color: inherit; text-decoration: none;
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+/* Link cards: one look for the hero .topic-btn and the .card-link grid.
+   White card, green circle icon, green title (underlined on hover/focus), green arrow at the right. */
+.card-link, .topic-btn {
+  display: flex; align-items: center; gap: 1rem; min-height: 44px;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-card);
+  color: var(--color-text); text-decoration: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
-.card-link .card-title { color: var(--color-primary); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
-.card-link:hover { border-color: var(--color-primary); box-shadow: var(--shadow-card-hover, var(--shadow-card)); }
-.card-link .card-icon {
-  display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; flex: none;
-  border-radius: var(--radius-sm); background: var(--color-surface-alt); color: var(--color-primary);
+.card-link { height: 100%; }
+.card-link:hover, .topic-btn:hover {
+  border-color: var(--color-primary); box-shadow: var(--shadow-card-hover, var(--shadow-card)); transform: translateY(-1px);
+}
+.card-link .card-icon, .topic-btn .topic-icon {
+  display: inline-grid; place-items: center; width: 3rem; height: 3rem; flex: none;
+  border-radius: 50%; background: var(--color-primary); color: var(--color-primary-contrast);
+}
+.card-link .card-icon .icon, .topic-btn .topic-icon .icon { width: 1.5rem; height: 1.5rem; }
+.card-link .card-title, .topic-btn .topic-label {
+  font-family: var(--font-display); font-weight: 700; color: var(--color-primary);
+  text-decoration: none; text-decoration-thickness: 2px; text-underline-offset: 0.18em;
+}
+.card-link:hover .card-title, .card-link:focus-visible .card-title,
+.topic-btn:hover .topic-label, .topic-btn:focus-visible .topic-label { text-decoration-line: underline; }
+.card-link::after, .topic-btn::after {
+  content: ""; flex: none; width: 1.5rem; height: 1.5rem; margin-left: auto;
+  color: var(--color-primary); background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 /* "Do ONE of these" parallel cards */
@@ -310,14 +322,22 @@ a:hover { text-decoration-thickness: 3px; }
 .callout-strong { background: var(--color-primary); color: var(--color-primary-contrast); border-left-color: var(--color-accent); }
 .callout-strong h2, .callout-strong h3, .callout-strong a { color: var(--color-primary-contrast); }
 
-/* ---------- Narrow single-column layout (get-care) ---------- */
-.layout-narrow .container { max-width: calc(var(--content-max, 760px) + 2rem); }
+/* ---------- Narrow single-column layout (get-care, am-i-exempt) ----------
+   The container stays the same 72rem as every other page, so the left edge of the
+   content lines up with Home; only its direct children are capped at a readable ~760px
+   (left-aligned, not centered). The phone strip's button still sits at the container's right. */
+.layout-narrow .container > * { max-width: var(--content-max, 760px); }
 .layout-narrow .page-head { padding-bottom: var(--space-4); }
 .layout-narrow .section { padding: 0 0 var(--space-3); }
 .layout-narrow .section + .section { padding-top: 0; }
-.layout-narrow .page-head + .section { padding-top: var(--space-4); }
-.layout-narrow .card, .layout-narrow .callout {
-  padding: clamp(var(--space-3), 6vw, var(--space-4)); max-width: none; margin: 0;
+/* Gap between the title band (or the visitor prompt) and the first card; the quiz page wraps its sections in <form class="quiz"> */
+.layout-narrow .page-head + .section, .layout-narrow .page-head + .quiz > .section:first-of-type { padding-top: var(--space-4); }
+/* Column-level cards and callouts (direct children of the column, or of .result-list) fill the
+   capped column with roomier padding. :where() keeps specificity at 0,2,0 and skips a callout
+   nested inside a card (e.g. .result-update), which keeps its own margin and padding. */
+.layout-narrow .card:where(.container > *, .result-list > *),
+.layout-narrow .callout:where(.container > *) {
+  padding: clamp(var(--space-3), 6vw, var(--space-4)); margin: 0;
 }
 .layout-narrow .card > :last-child, .layout-narrow .callout > :last-child { margin-bottom: 0; }
 .layout-narrow .card h2 { margin-top: 0; }
@@ -366,45 +386,33 @@ a:hover { text-decoration-thickness: 3px; }
 .btn-ghost { background: var(--color-surface); color: var(--color-primary); }
 .btn-ghost:hover { background: var(--color-surface-alt); }
 
-/* Phone numbers. Two forms of one style (terracotta + phone icon; the icon is CSS-only,
-   so the accessible name stays the number):
-   - Inside a sentence: bold terracotta text with an icon and underline, so the sentence still reads smoothly.
-   - Standing on its own (.tel-big, phone strip, who-to-call list rows): a tap-to-call pill button, 44px+ tall. */
+/* Phone numbers: three sizes of one green pill call button with a phone icon (CSS-only, so the
+   accessible name stays the number). Small = inline in a sentence; medium = who-to-call rows and
+   compact lists (.phone-num, .compact-list); big = hero numbers (.tel-big, .phone-strip). All 44px+ tall. */
 .tel {
-  display: inline; padding-block: 0.65em; font-weight: 700; white-space: nowrap;
-  color: var(--color-call, var(--color-primary));
-  text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em;
+  display: inline-flex; align-items: center; gap: 0.5em; vertical-align: middle;
+  min-height: 44px; padding: 0.25rem 0.875rem; margin-block: 0.125rem;
+  border: 2px solid var(--color-call, var(--color-primary)); border-radius: var(--radius-pill, 999px);
+  background: var(--color-call, var(--color-primary)); color: var(--color-call-contrast, #fff);
+  font-size: 1rem; font-weight: 700; line-height: 1.2; white-space: nowrap; text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
-.tel:hover { color: var(--color-call-hover, var(--color-accent)); text-decoration-thickness: 2px; }
-.callout-strong .tel, .callout-strong .tel:hover { color: var(--color-primary-contrast); }
+.tel:hover { background: var(--color-call-hover, var(--color-accent)); border-color: var(--color-call-hover, var(--color-accent)); color: var(--color-call-contrast, #fff); }
 .tel::before {
-  display: inline-block; vertical-align: -0.15em; margin-right: 0.35em;
   content: ""; flex: none; width: 1.05em; height: 1.05em; background-color: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z'/%3E%3C/svg%3E") center / contain no-repeat;
           mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-
-/* Standalone numbers: the button */
-.tel-big .tel, .phone-strip .tel, .phone-num .tel, .compact-list .tel {
-  display: inline-flex; align-items: center; gap: 0.5em; vertical-align: middle;
-  min-height: 44px; padding: 0.375rem 1.125rem; margin-block: 0.125rem;
-  border: 2px solid var(--color-call, var(--color-primary)); border-radius: var(--radius-pill, 999px);
-  background: var(--color-call, var(--color-primary)); color: var(--color-call-contrast, #fff);
-  line-height: 1.2; text-decoration: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-.tel-big .tel::before, .phone-strip .tel::before, .phone-num .tel::before, .compact-list .tel::before { margin-right: 0; vertical-align: 0; }
-.tel-big .tel:hover, .phone-strip .tel:hover, .phone-num .tel:hover, .compact-list .tel:hover {
-  background: var(--color-call-hover, var(--color-accent)); border-color: var(--color-call-hover, var(--color-accent)); color: var(--color-call-contrast, #fff);
-}
+/* Medium: standalone rows */
+.phone-num .tel, .compact-list .tel { font-size: inherit; padding: 0.375rem 1.125rem; }
+/* Big: hero-size number */
+.tel-big .tel, .phone-strip .tel { font-size: clamp(1.375rem, 1.15rem + 1.1vw, 1.75rem); padding: 0.5rem 1.375rem; }
 /* On the dark green callout the button flips to white with green text */
-.callout-strong .tel-big .tel { background: var(--color-surface); border-color: var(--color-surface); color: var(--color-primary); }
-.callout-strong .tel-big .tel:hover { background: var(--color-surface-alt); border-color: var(--color-surface-alt); color: var(--color-accent); }
+.callout-strong .tel { background: var(--color-surface); border-color: var(--color-surface); color: var(--color-primary); }
+.callout-strong .tel:hover { background: var(--color-surface-alt); border-color: var(--color-surface-alt); color: var(--color-accent); }
 /* TTY: same button shape and icon, outlined, so it doesn't compete with the main number */
 .phone-num .tel-tty, .phone-num .tel-tty:hover { background: var(--color-surface); color: var(--color-call, var(--color-primary)); border-color: var(--color-call, var(--color-primary)); }
 .phone-num .tel-tty:hover { background: var(--color-surface-alt); color: var(--color-call-hover, var(--color-accent)); }
-/* Bigger hero-size number */
-.tel-big .tel, .phone-strip .tel { font-size: clamp(1.375rem, 1.15rem + 1.1vw, 1.75rem); padding: 0.5rem 1.375rem; }
 /* Plain links inside text: extra vertical padding so the tap area is at least ~26px without changing line spacing */
 p a:not(.btn):not(.tel), li a:not(.btn):not(.tel):not(.card-link):not(.topic-btn) { padding-block: 0.2em; }
 
@@ -462,16 +470,18 @@ p a:not(.btn):not(.tel), li a:not(.btn):not(.tel):not(.card-link):not(.topic-btn
 .phone-strip + .site-footer { margin-top: 0; }
 
 /* ---------- Visitor prompt (DOM from visitor-count.js) ---------- */
-/* A small bar pinned to the bottom of the screen until the visitor answers or skips.
-   visitor-count.js adds the same height as padding-bottom on <body>, so nothing is covered. */
+/* A quiet in-flow panel under the page title, scrolling with the page, until the visitor answers or skips.
+   Inserted by visitor-count.js right after .hero / .page-head inside <main>; no fixed position, no body padding. */
 .vp {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000;
-  background: var(--color-surface); color: var(--color-text);
-  border-top: 1px solid var(--color-border); box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.12);
-  padding: var(--space-1) 0 max(var(--space-1), env(safe-area-inset-bottom, 0px));
+  max-width: 72rem; margin: var(--space-2) auto 0; padding: 0 1rem;
+  color: var(--color-text);
 }
+@media (min-width: 600px) { .vp { padding: 0 1.5rem; } }
+.layout-narrow .vp-card { max-width: var(--content-max, 760px); } /* same left-aligned column as the page content */
+.layout-narrow .vp { margin-bottom: var(--space-4); } /* same gap as .page-head + .section above */
 .vp-card {
-  max-width: 72rem; margin: 0 auto; padding: 0 1rem;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-card); padding: var(--space-2);
   display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
   column-gap: var(--space-2); row-gap: var(--space-1);
 }
@@ -505,7 +515,7 @@ p a:not(.btn):not(.tel), li a:not(.btn):not(.tel):not(.card-link):not(.topic-btn
 /* ---------- Motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-  .topic-btn:hover { transform: none; }
+  .topic-btn:hover, .card-link:hover { transform: none; }
 }
 
 /* ---------- Print ---------- */
@@ -519,8 +529,7 @@ p a:not(.btn):not(.tel), li a:not(.btn):not(.tel):not(.card-link):not(.topic-btn
   a { color: #000 !important; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-weight: normal; font-size: 0.9em; word-break: break-all; }
   a[href^="tel:"]::after { content: ""; }
-  .tel-big .tel, .phone-strip .tel, .phone-num .tel, .compact-list .tel { background: #fff !important; color: #000 !important; border: 1px solid #000 !important; min-height: 0; }
-  .tel { color: #000 !important; }
+  .tel { background: #fff !important; color: #000 !important; border: 1px solid #000 !important; min-height: 0; }
   .tel::before { display: none; }
   .card-urgent { background: #fff !important; border-left: 6px solid #000 !important; }
   .section, .section-alt { padding: 0.75rem 0; margin: 0; }
@@ -592,7 +601,7 @@ p a:not(.btn):not(.tel), li a:not(.btn):not(.tel):not(.card-link):not(.topic-btn
   .jump-nav ul { grid-template-columns: 1fr; }
   .jump-nav li:last-child:nth-child(odd) { grid-column: auto; }
   .tel { white-space: normal; }
-  .phone-num .tel, .compact-list .tel { padding-inline: 0.75rem; }
+  .tel, .phone-num .tel, .compact-list .tel { padding-inline: 0.75rem; }
   .tel-big .tel, .phone-strip .tel { font-size: 1.25rem; padding-inline: 0.875rem; }
   .layout-narrow .container { padding-inline: 0.5rem; }
   .layout-narrow .card, .layout-narrow .callout { padding: 0.75rem; }

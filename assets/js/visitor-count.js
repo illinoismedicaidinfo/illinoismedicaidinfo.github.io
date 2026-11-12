@@ -4,12 +4,12 @@
  * WHAT IT DOES
  *   The first time someone opens the site in a browser, ONE row
  *   {"role": "visit"} is sent to Supabase, so every first-time visitor is
- *   counted even if they never answer. Then a small bar pinned to the bottom
- *   of the screen asks whether they are a patient/family member or a
- *   provider/staff (or Skip). The bar stays on every page until they choose.
+ *   counted even if they never answer. Then a small panel just below the page
+ *   title (it scrolls with the page) asks whether they are a patient/family
+ *   member or a provider/staff (or Skip). It shows on every page until they choose.
  *   A patient or provider answer is sent as ONE more row: {"role": "..."}.
  *   Both facts are remembered in that browser (localStorage key
- *   "hesjlp-visitor"), so the visit is counted once and the bar never shows
+ *   "hesjlp-visitor"), so the visit is counted once and the prompt never shows
  *   there again after an answer.
  *   Nothing else is sent: no names, no IP logging by us, no cookies.
  *   If Supabase is down, paused, or unreachable, the site works normally and
@@ -159,7 +159,7 @@
     }
 
     var body = document.body;
-    // A small bar pinned to the bottom of the screen (CSS: .vp in base.css).
+    // A small panel under the page title, in the normal page flow (CSS: .vp in base.css).
     // Not a dialog: no aria-modal, no focus trap, no inert background.
     var banner = document.createElement("section");
     banner.id = "visitor-prompt";
@@ -169,23 +169,6 @@
 
     var buttons = [].slice.call(banner.querySelectorAll("button[data-role]"));
 
-    // The bar covers the bottom of the screen, so give the page the same
-    // amount of extra room at the bottom (and keep focused elements above it).
-    function fitBanner() {
-      try {
-        var h = banner.offsetHeight;
-        body.style.paddingBottom = h + "px";
-        document.documentElement.style.scrollPaddingBottom = h + "px";
-      } catch (e) { /* ignore */ }
-    }
-    function unfitBanner() {
-      try {
-        body.style.paddingBottom = "";
-        document.documentElement.style.scrollPaddingBottom = "";
-      } catch (e) { /* ignore */ }
-      window.removeEventListener("resize", fitBanner);
-    }
-
     var done = false;
     function choose(role) {
       if (done) return;
@@ -194,11 +177,10 @@
       state.role = role;
       state.at = new Date().toISOString();
       storageSet(JSON.stringify(state));
-      // 2. Remove the bar. If keyboard focus was on it, move focus to the
+      // 2. Remove the panel. If keyboard focus was on it, move focus to the
       //    main content so it is not lost.
       var hadFocus = banner.contains(document.activeElement);
       if (banner.parentNode) banner.parentNode.removeChild(banner);
-      unfitBanner();
       if (hadFocus) {
         try {
           var target = document.getElementById("main") || body;
@@ -221,14 +203,20 @@
       btn.addEventListener("click", function () { choose(btn.getAttribute("data-role")); });
     });
 
-    // In the reading order it sits right after the site header, even though
-    // it is drawn at the bottom of the screen.
-    var header = document.querySelector(".site-header");
-    if (header && header.parentNode) header.parentNode.insertBefore(banner, header.nextSibling);
-    else body.insertBefore(banner, body.firstChild);
-    fitBanner();
-    window.addEventListener("resize", fitBanner);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitBanner, function () {});
+    // Place it inside <main> right after the title band (.hero on the home
+    // page, .page-head on inner pages); else first in #main; else after the
+    // site header.
+    var main = document.getElementById("main");
+    var head = main ? main.querySelector(".hero, .page-head") : null;
+    if (head && head.parentNode) {
+      head.parentNode.insertBefore(banner, head.nextSibling);
+    } else if (main) {
+      main.insertBefore(banner, main.firstChild);
+    } else {
+      var header = document.querySelector(".site-header");
+      if (header && header.parentNode) header.parentNode.insertBefore(banner, header.nextSibling);
+      else body.insertBefore(banner, body.firstChild);
+    }
   }
 
   function safeInit() {

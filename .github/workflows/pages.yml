@@ -38,6 +38,8 @@ jobs:
           # Every .html file at the root of the repository is a page of the site.
           cp *.html config.js _site/
           cp -r assets _site/assets
+          # Spanish pages: same file names, in es/.
+          cp -r es _site/es
           # Pages serves these files as-is. No Jekyll processing.
           touch _site/.nojekyll
           echo "Files to publish:"

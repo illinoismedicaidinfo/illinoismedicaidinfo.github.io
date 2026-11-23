@@ -8,6 +8,8 @@
      .skip-link        "Skip to main content", first focusable element
      .container        centered max-width wrapper with side gutters
      .site-header      top bar;  .brand  site name link;  .brand-mark  logo circle
+     .header-tools     right side of the header bar: .lang-switch + .nav-toggle
+     .lang-switch      link to the same page in the other language (es/ <-> root)
      .nav-toggle       "Menu" disclosure button (aria-expanded, shown by site.js)
      .site-nav         list of page links; [aria-current="page"] marks current
      .site-footer      footer;  .footer-note  "Information checked" line
@@ -144,6 +146,17 @@ a:hover { text-decoration-thickness: 3px; }
   border: 2px solid var(--color-primary); border-radius: var(--radius-pill, 999px); cursor: pointer;
 }
 .nav-toggle[aria-expanded="true"] { background: var(--color-primary); color: var(--color-primary-contrast); }
+/* Language switch + Menu stay together at the right of the header bar, outside the
+   collapsible nav, so a reader of the other language can always see it. */
+.header-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0.5rem; margin-left: auto; }
+.lang-switch {
+  display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; min-width: 44px;
+  padding: 0.5rem 0.875rem; font-weight: 700; font-size: 1.0625rem; line-height: 1.2; white-space: nowrap;
+  color: var(--color-primary); background: var(--color-surface); text-decoration: none;
+  border: 2px solid var(--color-border-strong, var(--color-primary)); border-radius: var(--radius-pill, 999px);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.lang-switch:hover { border-color: var(--color-primary); background: var(--color-surface-alt); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.18em; }
 .site-nav { width: 100%; }
 .site-nav ul { list-style: none; margin: 0; padding: 0.25rem 0 0.5rem; display: flex; flex-direction: column; gap: 0.25rem; }
 .site-nav a {
@@ -154,11 +167,13 @@ a:hover { text-decoration-thickness: 3px; }
 .site-nav a[aria-current="page"] { background: var(--color-surface-alt); color: var(--color-primary); box-shadow: inset 4px 0 0 var(--color-primary); }
 .js .site-nav.is-collapsed { display: none; }
 
+/* Wide screens: two rows. Brand left and language switch right on top, nav links below.
+   One row does not fit the nav, the brand and the switch (Spanish labels are longer),
+   and keeping the switch first after the brand makes DOM, focus and visual order match. */
 @media (min-width: 900px) {
-  .site-header .container { flex-wrap: nowrap; }
   .nav-toggle { display: none !important; }
-  .js .site-nav.is-collapsed, .site-nav { display: block; width: auto; }
-  .site-nav ul { flex-direction: row; padding: 0; gap: 0.25rem; }
+  .js .site-nav.is-collapsed, .site-nav { display: block; width: 100%; }
+  .site-nav ul { flex-direction: row; flex-wrap: wrap; padding: 0; gap: 0.25rem; }
   .site-nav a { min-height: 44px; padding: 0.5rem 0.75rem; }
   .site-nav a[aria-current="page"] { box-shadow: inset 0 -3px 0 var(--color-primary); }
 }
@@ -520,7 +535,7 @@ p a:not(.btn):not(.tel), li a:not(.btn):not(.tel):not(.card-link):not(.topic-btn
 
 /* ---------- Print ---------- */
 @media print {
-  .skip-link, .nav-toggle, .site-nav, .jump-nav, .vp, .clinic-actions .map-link, .topic-btn > .icon { display: none !important; }
+  .skip-link, .nav-toggle, .lang-switch, .site-nav, .jump-nav, .vp, .clinic-actions .map-link, .topic-btn > .icon { display: none !important; }
   body { font-size: 12pt; line-height: 1.45; background: #fff; color: #000; }
   .hero, .page-head, .section-alt, .phone-strip, .site-footer, .callout, .callout-strong { background: #fff !important; color: #000 !important; box-shadow: none !important; }
   .phone-strip *, .site-footer *, .callout-strong * { color: #000 !important; }
@@ -583,7 +598,8 @@ p a:not(.btn):not(.tel), li a:not(.btn):not(.tel):not(.card-link):not(.topic-btn
 .quiz-results h2:focus { outline: none; }
 .quiz-results h2:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
 .quiz-summary { font-size: var(--text-lg, 1.25rem); margin: 0 0 var(--space-3); }
-.result-list { display: grid; gap: var(--space-3); }
+/* minmax(0, 1fr): an "auto" track grows to the widest card's min-content (long link text) and scrolls a 320px page sideways */
+.result-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-3); }
 .result[hidden], .result-unsure[hidden] { display: none; }
 .result h3 { font-size: var(--text-h2, 1.5rem); margin: 0 0 var(--space-1); }
 .result h4 { font-size: var(--text-h3, 1.25rem); margin: var(--space-3) 0 var(--space-1); }
@@ -609,6 +625,7 @@ p a:not(.btn):not(.tel), li a:not(.btn):not(.tel):not(.card-link):not(.topic-btn
   .card .checklist > li::before { left: 0.625rem; }
   .card .checklist > li::after { left: 1.08rem; }
   .btn { white-space: normal; max-width: 100%; }
+  .lang-switch, .nav-toggle { padding-inline: 0.625rem; }
   .eyebrow { letter-spacing: 0.02em; padding-inline: 0.5rem; overflow-wrap: anywhere; }
   .quiz-options > li, .quiz-option { min-width: 0; }
   .quiz-option { padding: 0.5rem; gap: 0.5rem; overflow-wrap: anywhere; }

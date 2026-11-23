@@ -128,14 +128,38 @@
     }
   }
 
+  // Words shown in the bar, per language. Chosen by <html lang>; anything else
+  // falls back to English. Only the words change: the roles sent stay the same.
+  var STRINGS = {
+    en: {
+      title: "Who is visiting today?",
+      patient: "Patient or family member",
+      provider: "Provider or staff",
+      skip: "Skip"
+    },
+    es: {
+      title: "¿Quién nos visita hoy?",
+      patient: "Paciente o familiar",
+      provider: "Proveedor de salud o personal",
+      skip: "Omitir"
+    }
+  };
+  var lang = (document.documentElement.getAttribute("lang") || "en").toLowerCase().split("-")[0];
+  var T = STRINGS[lang] || STRINGS.en;
+
+  // The words go into innerHTML below, so escape them.
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
   var MARKUP =
     '<div class="vp-card">' +
-      '<h2 id="vp-title">Who is visiting today?</h2>' +
+      '<h2 id="vp-title">' + esc(T.title) + '</h2>' +
       '<div class="vp-actions">' +
-        '<button type="button" class="vp-btn" data-role="patient">Patient or family member</button>' +
-        '<button type="button" class="vp-btn" data-role="provider">Provider or staff</button>' +
+        '<button type="button" class="vp-btn" data-role="patient">' + esc(T.patient) + '</button>' +
+        '<button type="button" class="vp-btn" data-role="provider">' + esc(T.provider) + '</button>' +
       '</div>' +
-      '<button type="button" class="vp-skip" data-role="skip">Skip</button>' +
+      '<button type="button" class="vp-skip" data-role="skip">' + esc(T.skip) + '</button>' +
     '</div>';
 
   function init() {

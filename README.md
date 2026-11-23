@@ -15,17 +15,19 @@ The site counts each first-time visitor as one row in a Supabase table, then ask
 | `clinics.html` | Free and low-cost clinics in Cook County, with addresses, phone links, and map links. |
 | `who-to-call.html` | Every phone number and website on the site in one list. |
 | `about.html` | What the site is and who made it, plus the full **Sources** list (`about.html#sources`), grouped by topic. Edit the placeholder text here. |
+| `es/` | The same 7 pages in Spanish, with the same file names. See [Languages](#languages). |
 | `assets/css/base.css` | Layout and components for every page. Colors, fonts, and shapes come from the theme file. |
 | `assets/css/theme-green.css` | Theme A: the flyer's green and mint palette. This is the default. |
 | `assets/css/theme-civic.css` | Theme B: navy and gold, public-service look. |
 | `assets/css/theme-warm.css` | Theme C: cream, teal, and coral, soft clinic look. |
-| `assets/js/site.js` | Skip link, mobile menu, and the theme preview switch. |
+| `assets/js/site.js` | Skip link, mobile menu, the theme preview switch, and keeping your place when you switch language. |
 | `assets/js/visitor-count.js` | The visit count, the patient/provider prompt, and the Supabase save. |
 | `assets/js/quiz.js` | The "Am I exempt?" quiz logic. Without it, the page shows every result as a list. |
 | `assets/fonts/` | Atkinson Hyperlegible Bold, used for headings. Self-hosted. License in `OFL.txt`. |
 | `config.js` | Supabase project URL, public key, and table name. |
 | `supabase/schema.sql` | Creates the table and its security rules. Run once in Supabase. |
 | `scripts/verify-supabase.sh` | Checks the database rules from the command line. |
+| `scripts/check-i18n-parity.py` | Checks that each Spanish page has the same phone numbers, ids, and quiz values as its English page. |
 | `.github/workflows/pages.yml` | Publishes the site to GitHub Pages on every push to `main`. |
 | `.nojekyll` | Tells GitHub Pages to serve files as-is, with no Jekyll build. |
 | `previews/` | Screenshots of every page in every theme, and a side-by-side compare page. |
@@ -63,7 +65,7 @@ The choice is remembered in that browser until you pick another. Screenshots of 
 A quick way to do step 1 for all pages from a terminal, for example to choose `warm`:
 
 ```bash
-sed -i 's/theme-green\.css/theme-warm.css/; s/data-theme="green"/data-theme="warm"/' *.html
+sed -i 's/theme-green\.css/theme-warm.css/; s/data-theme="green"/data-theme="warm"/' *.html es/*.html
 ```
 
 ## Edit the content
@@ -73,15 +75,31 @@ Every page is a normal HTML file. Open it in any text editor.
 - **Change a word, date, or number.** Find the text in the page and change it. Phone numbers appear twice: once as the visible text and once in the `href="tel:+1..."` link. Change both.
 - **Add a section.** Each section is a `<section id="..."> ... </section>` block with an HTML comment above it naming the section. Copy an existing section, give it a new `id` and a new `<h2>`, and edit the text inside. Keep one `<h1>` per page.
 - **Add a clinic.** In `clinics.html`, copy one `<li class="clinic">` block and change the name, address, phone, and map link. The map link is a Google Maps search for the address.
-- **Add a page.** Copy `about.html`, rename it, change the `<title>`, the `<meta name="description">`, and the `<h1>`. Then add a link to it in the `<nav>` of every page and in the "Find what you need" cards on `index.html`.
+- **Add a page.** Copy `about.html`, rename it, change the `<title>`, the `<meta name="description">`, the three `hreflang` links, the language switch link, and the `<h1>`. Then add a link to it in the `<nav>` of every page and in the "Find what you need" cards on `index.html`. Do the same in `es/` (see [Languages](#languages)).
 - **Cite a source.** At the end of a section or card that states a fact, add one line: `<p class="source-note">Source: <a href="URL" target="_blank" rel="noopener">Short name</a></p>` ("Sources:" with commas for more than one). Add any new source to the Sources list on `about.html` and update its "Last checked" date.
 - **Change "Information checked Nov. 2026".** It appears in the footer of every page. Search for it and change it everywhere.
 
 Keep the writing plain: short sentences, no jargon, phone numbers as digits. Keep text contrast high and tap targets large. The class names in `assets/css/base.css` are listed in a comment at the top of that file.
 
+## Languages
+
+The site is in English and Spanish.
+
+- **Structure.** English pages are at the root (`about.html`). Spanish pages are in `es/` with the same file names (`es/about.html`) and `<html lang="es">`. Spanish pages load the shared files with `../` (`../assets/...`, `../config.js`). Links between pages stay plain file names, so English links stay in English and Spanish links stay in Spanish. Every page works without JavaScript.
+- **The switch.** The header of every page has a link to the same page in the other language: "Español" on English pages, "English" on Spanish pages. It is a plain link. With JavaScript on, it also keeps the section you were on (`#...`) and any `?theme=`. The site never picks a language for you.
+- **Words added by JavaScript.** `assets/js/quiz.js` (quiz results) and `assets/js/visitor-count.js` (the visitor bar) each have a small `STRINGS` list with `en` and `es` words, picked by `<html lang>`. An entry marked `// TODO-ES` still needs translating.
+- **Change content in both languages.** Any change to a page (a word, a date, a phone number, a clinic, a section) must be made in the English page and in its `es/` page, in the same commit. Never change ids, classes, `tel:` links, form values, or `data-result` / `data-show-if` values in only one language.
+- **Check the two languages match.** Run this before every push. It fails if a Spanish page is missing, or if its phone numbers, ids, quiz values, or asset paths differ from the English page. It also lists external links that differ and any `TODO-ES` left.
+
+```bash
+python3 scripts/check-i18n-parity.py
+```
+
+- **Publishing.** The workflow publishes `es/` along with the root pages, so a Spanish page needs no change to the workflow. The Spanish site is at `https://illinoismedicaidinfo.github.io/es/`. Each page's `<head>` lists both language versions (`<link rel="alternate" hreflang="...">`). Add those three lines to any new page.
+
 ## Publish changes
 
-GitHub Pages serves the site. The workflow in `.github/workflows/pages.yml` runs on every push to `main`. It copies only the website files (every `.html` file at the root, `config.js`, and `assets/`) and publishes them. The README, screenshots, database files, and tooling are not published.
+GitHub Pages serves the site. The workflow in `.github/workflows/pages.yml` runs on every push to `main`. It copies only the website files (every `.html` file at the root, `config.js`, `assets/`, and the Spanish pages in `es/`) and publishes them. The README, screenshots, database files, and tooling are not published.
 
 One-time setup:
 

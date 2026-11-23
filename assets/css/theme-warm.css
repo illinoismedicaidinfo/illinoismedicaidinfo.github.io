@@ -85,6 +85,7 @@ html[data-theme="warm"] h2, html[data-theme="warm"] h3 { color: var(--color-prim
 /* Focus: base ring flips radius to 4px; keep the soft shapes on focus too */
 html[data-theme="warm"] .btn:focus-visible,
 html[data-theme="warm"] .nav-toggle:focus-visible,
+html[data-theme="warm"] .lang-switch:focus-visible,
 html[data-theme="warm"] .jump-nav a:focus-visible,
 html[data-theme="warm"] .site-nav a:focus-visible,
 html[data-theme="warm"] .vp-btn:focus-visible,

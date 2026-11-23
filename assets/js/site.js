@@ -2,7 +2,9 @@
    1. Skip link: move focus to <main> reliably (some browsers keep focus on the link).
    2. Mobile nav: "Menu" disclosure button with aria-expanded.
    3. Theme preview: ?theme=green|civic|warm (or localStorage "hesjlp-theme")
-      swaps the #theme-css stylesheet and html[data-theme]. Preview only. */
+      swaps the #theme-css stylesheet and html[data-theme]. Preview only.
+   4. Language switch: the .lang-switch link keeps the #section and ?theme= when clicked.
+      Without JS it is a plain link to the same page in the other language. */
 (function () {
   "use strict";
   var doc = document.documentElement;
@@ -56,7 +58,20 @@
     }
   } catch (e) { /* URLSearchParams unsupported */ }
   if (link && chosen && chosen !== doc.getAttribute("data-theme")) {
-    link.setAttribute("href", "assets/css/theme-" + chosen + ".css");
+    // Keep the link's own folder ("assets/css/" or "../assets/css/" in es/), swap only the file name.
+    link.setAttribute("href", link.getAttribute("href").replace(/theme-[a-z]+\.css$/, "theme-" + chosen + ".css"));
     doc.setAttribute("data-theme", chosen);
   }
+
+  /* ---- 4. Language switch: carry over #hash and ?theme= ---- */
+  [].forEach.call(document.querySelectorAll(".lang-switch"), function (a) {
+    a.addEventListener("click", function () {
+      try {
+        var href = a.getAttribute("href").split("#")[0].split("?")[0];
+        var theme = new URLSearchParams(window.location.search).get("theme");
+        if (theme && THEMES.indexOf(theme) !== -1) href += "?theme=" + theme;
+        a.setAttribute("href", href + window.location.hash);
+      } catch (e) { /* plain link still works */ }
+    });
+  });
 })();
